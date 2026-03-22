@@ -1,69 +1,67 @@
 #include "raylib.h"
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 450;
-const int STARTING_FPS = 60;
+static const int SCREEN_WIDTH = 800;
+static const int SCREEN_HEIGHT = 450;
+static const int STARTING_FPS = 60;
+static const int EXIT_KEY = KEY_ESCAPE;
+static const int MAX_FRAME_SPEED = 15;
+static const int MIN_FRAME_SPEED = 1;
+static const int FRAME_WIDTH = 32;
+static const int PROJECTION_WIDTH = 256;
+
+static int currentFps = STARTING_FPS;
 
 int main(void) {
-  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - delta time");
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "up and down game");
 
-  int currentFps = STARTING_FPS;
+  Texture2D blobBoi = LoadTexture("assets/blob_boi_a_forward.png");
+  Texture2D tallBoi = LoadTexture("assets/tall_boi_a_forward.png");
+  Texture2D blast = LoadTexture("assets/blast_right.png");
 
-  // initial point of both circles
-  Vector2 deltaCircle = {0, (float)SCREEN_HEIGHT / 3.0f};
-  Vector2 frameCircle = {0, (float)SCREEN_HEIGHT * (2.0f / 3.0f)};
+  Rectangle blobBoiProjection = {0.0f, (float)SCREEN_HEIGHT - PROJECTION_WIDTH,
+                                 PROJECTION_WIDTH, PROJECTION_WIDTH};
+  Rectangle tallBoiProjection = {(float)SCREEN_WIDTH - PROJECTION_WIDTH,
+                                 (float)SCREEN_HEIGHT - PROJECTION_WIDTH,
+                                 PROJECTION_WIDTH, PROJECTION_WIDTH};
+  Rectangle blastProjection = {(float)SCREEN_WIDTH - (2 * PROJECTION_WIDTH),
+                               (float)SCREEN_HEIGHT - PROJECTION_WIDTH,
+                               PROJECTION_WIDTH, PROJECTION_WIDTH};
 
-  const float speed = 10.0f;
-  const float circleRadius = 32.0f;
+  Rectangle frameRec = {0.0f, 0.0f, FRAME_WIDTH, FRAME_WIDTH};
+  Rectangle blastFrameRec = {0.0f, 0.0f, 16, 16};
 
-  SetTargetFPS(currentFps);
+  int currentFrame = 0;
+  int framesCounter = 0;
+  int framesSpeed = 1;
+  SetTargetFPS(60);
 
-  SetExitKey(KEY_NULL);
-
+  SetExitKey(EXIT_KEY);
   while (!WindowShouldClose()) {
-    float mouseWheel = GetMouseWheelMove();
-    if (mouseWheel != 0) {
-      currentFps += (int)mouseWheel;
-      if (currentFps < 0)
-        currentFps = 0;
-      SetTargetFPS(currentFps);
+    // Update
+    framesCounter++;
+
+    if (framesCounter >= (60 / framesSpeed)) {
+      framesCounter = 0;
+      currentFrame++;
+
+      if (currentFrame > 1)
+        currentFrame = 0;
+
+      frameRec.x = currentFrame * FRAME_WIDTH;
+      blastFrameRec.x = currentFrame * 16;
     }
 
-    deltaCircle.x += GetFrameTime() * 6.0f * speed;
-    frameCircle.x += 0.1f * speed;
-
-    if (deltaCircle.x > SCREEN_WIDTH)
-      deltaCircle.x = 0;
-    if (frameCircle.x > SCREEN_WIDTH)
-      frameCircle.x = 0;
-
-    if (IsKeyPressed(KEY_R)) {
-      deltaCircle.x = 0;
-      frameCircle.x = 0;
-    }
-
+    // Draw
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
-    // Draw the circles
-    DrawCircleV(deltaCircle, circleRadius, RED);
-    DrawCircleV(frameCircle, circleRadius, BLUE);
+    DrawTexturePro(blobBoi, frameRec, blobBoiProjection, (Vector2){0.0f, 0.0f},
+                   0.0f, WHITE);
+    DrawTexturePro(tallBoi, frameRec, tallBoiProjection, (Vector2){0.0f, 0.0f},
+                   0.0f, WHITE);
 
-    const char *fpsText = 0;
-    if (currentFps <= 0)
-      fpsText = TextFormat("FPS: unlimited (%i)", GetFPS());
-    else
-      fpsText = TextFormat("FPS: %i (target: %i)", GetFPS(), currentFps);
-
-    DrawText(fpsText, 10, 10, 20, DARKGRAY);
-    DrawText(TextFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20,
-             DARKGRAY);
-    DrawText("Use the scroll wheel to chang the fps limit, r to reset", 10, 50,
-             20, DARKGRAY);
-
-    DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, RED);
-    DrawText("FUNC: x += speed", 10, 240, 20, BLUE);
-
+    DrawTexturePro(blast, blastFrameRec, blastProjection, (Vector2){0.0f, 0.0f},
+                   0.0f, WHITE);
     EndDrawing();
   }
 
