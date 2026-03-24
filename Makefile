@@ -1,6 +1,6 @@
 CC = gcc
 TARGET = bin/sewers
-SRC = main.c
+SRC = $(wildcard src/*.c)
 
 RAYLIB_PREFIX := $(shell brew --prefix raylib)
 
