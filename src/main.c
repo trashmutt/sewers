@@ -14,20 +14,9 @@ static int current_fps = STARTING_FPS;
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "up and down game");
-  sprites_loadTextures();
-
-  Rectangle blob_boi_projection = {0.0f,
-                                   (float)SCREEN_HEIGHT - PROJECTION_WIDTH,
-                                   PROJECTION_WIDTH, PROJECTION_WIDTH};
-  Rectangle tall_boi_projection = {(float)SCREEN_WIDTH - PROJECTION_WIDTH,
-                                   (float)SCREEN_HEIGHT - PROJECTION_WIDTH,
-                                   PROJECTION_WIDTH, PROJECTION_WIDTH};
-  Rectangle blast_projection = {(float)SCREEN_WIDTH - (2 * PROJECTION_WIDTH),
-                                (float)SCREEN_HEIGHT - PROJECTION_WIDTH,
-                                PROJECTION_WIDTH, PROJECTION_WIDTH};
-
-  Rectangle frame_rec = {0.0f, 0.0f, FRAME_WIDTH, FRAME_WIDTH};
-  Rectangle blast_frame_rec = {0.0f, 0.0f, 16, 16};
+  sprites_load_textures();
+  sprites_load_starting_projections(SCREEN_HEIGHT, SCREEN_WIDTH,
+                                    PROJECTION_WIDTH, PROJECTION_WIDTH);
 
   int current_frame = 0;
   int frames_counter = 0;
@@ -46,20 +35,22 @@ int main(void) {
       if (current_frame > 1)
         current_frame = 0;
 
-      frame_rec.x = current_frame * FRAME_WIDTH;
-      blast_frame_rec.x = current_frame * 16;
+      sprites_frame_32_px.x = current_frame * FRAME_WIDTH;
+      sprites_frame_16_px.x = current_frame * 16;
     }
 
     // Draw
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
-    DrawTexturePro(sprites_blob_boi, frame_rec, blob_boi_projection,
-                   (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
-    DrawTexturePro(sprites_tall_boi, frame_rec, tall_boi_projection,
-                   (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+    DrawTexturePro(sprites_blob_boi, sprites_frame_32_px,
+                   sprites_blob_boi_projection, (Vector2){0.0f, 0.0f}, 0.0f,
+                   WHITE);
+    DrawTexturePro(sprites_tall_boi, sprites_frame_32_px,
+                   sprites_tall_boi_projection, (Vector2){0.0f, 0.0f}, 0.0f,
+                   WHITE);
 
-    DrawTexturePro(sprites_blast, blast_frame_rec, blast_projection,
+    DrawTexturePro(sprites_blast, sprites_frame_32_px, sprites_blast_projection,
                    (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
     EndDrawing();
   }
