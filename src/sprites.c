@@ -1,41 +1,48 @@
 #include "sprites.h"
 #include "raylib.h"
 
-const char *sprites_blob_boi_path = "assets/blob_boi_a_forward.png";
-const char *sprites_tall_boi_path = "assets/tall_boi_a_forward.png";
-const char *sprites_blast_path = "assets/blast_right.png";
+static const char *sprite_paths[SPRITE_COUNT] = {
+    "assets/blob_boi_a_forward.png",
+    "assets/tall_boi_a_forward.png",
+    "assets/blast_right.png",
+};
 
-Texture2D sprites_blob_boi;
-Texture2D sprites_tall_boi;
-Texture2D sprites_blast;
-
-Rectangle sprites_blob_boi_projection;
-Rectangle sprites_tall_boi_projection;
-Rectangle sprites_blast_projection;
-Rectangle sprites_frame_16_px;
-Rectangle sprites_frame_32_px;
+Sprite sprites[SPRITE_COUNT];
 
 void sprites_load_textures(void) {
-  sprites_blob_boi = LoadTexture("assets/blob_boi_a_forward.png");
-  sprites_tall_boi = LoadTexture("assets/tall_boi_a_forward.png");
-  sprites_blast = LoadTexture("assets/blast_right.png");
+  for (int i = 0; i < SPRITE_COUNT; i++) {
+    sprites[i].texture = LoadTexture(sprite_paths[i]);
+    sprites[i].frame_width = sprites[i].texture.width / FRAMES_MAX;
+    sprites[i].frame = (Rectangle){0.0f, 0.0f, sprites[i].frame_width,
+                                   sprites[i].texture.height};
+  }
 }
 
 void sprites_load_starting_projections(int screen_height, int screen_width,
-                                       int prijection_height,
+                                       int projection_height,
                                        int projection_width) {
-  sprites_frame_16_px = (Rectangle){0.0f, 0.0f, 16, 16};
-  sprites_frame_32_px = (Rectangle){0.0f, 0.0f, 32, 32};
-
-  sprites_blob_boi_projection =
+  sprites[SPRITE_BLOB_BOI].projection =
       (Rectangle){0.0f, (float)screen_height - projection_width,
                   projection_width, projection_width};
-  sprites_tall_boi_projection =
+  sprites[SPRITE_TALL_BOI].projection =
       (Rectangle){(float)screen_width - projection_width,
-                  (float)screen_height - projection_width, projection_width,
+                  (float)screen_height - projection_width, projection_height,
                   projection_width};
-  sprites_blast_projection =
+  sprites[SPRITE_BLAST].projection =
       (Rectangle){(float)screen_width - (2 * projection_width),
-                  (float)screen_height - projection_width, projection_width,
+                  (float)screen_height - projection_width, projection_height,
                   projection_width};
+}
+
+void sprites_update_frame(int current_frame) {
+  for (int i = 0; i < SPRITE_COUNT; i++) {
+    sprites[i].frame.x = current_frame * sprites[i].frame_width;
+  }
+}
+
+void sprites_draw_all(void) {
+  for (int i = 0; i < SPRITE_COUNT; i++) {
+    DrawTexturePro(sprites[i].texture, sprites[i].frame, sprites[i].projection,
+                   (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+  }
 }

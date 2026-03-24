@@ -3,26 +3,28 @@
 
 #include "raylib.h"
 
-extern Texture2D sprites[3];
+#define SPRITE_COUNT 3
+#define FRAMES_MAX 2
 
-extern const char *sprites_blob_boi_path;
-extern const char *sprites_tall_boi_path;
-extern const char *sprites_blast_path;
+typedef enum {
+  SPRITE_BLOB_BOI = 0,
+  SPRITE_TALL_BOI = 1,
+  SPRITE_BLAST = 2,
+} SpriteID;
 
-extern Texture2D sprites_blob_boi;
-extern Texture2D sprites_tall_boi;
-extern Texture2D sprites_blast;
+typedef struct {
+  Texture2D texture;
+  Rectangle frame;
+  Rectangle projection;
+  int frame_width;
+} Sprite;
 
-extern Rectangle sprites_blob_boi_projection;
-extern Rectangle sprites_tall_boi_projection;
-extern Rectangle sprites_blast_projection;
-extern Rectangle sprites_frame_16_px;
-extern Rectangle sprites_frame_32_px;
+extern Sprite sprites[SPRITE_COUNT];
 
-extern void sprites_load_textures(void);
-extern void sprites_load_starting_projections(int screen_height,
-                                              int screen_width,
-                                              int sprite_height,
-                                              int sprite_width);
-
+void sprites_load_textures(void);
+void sprites_load_starting_projections(int screen_height, int screen_width,
+                                       int projection_height,
+                                       int projection_width);
+void sprites_update_frame(int current_frame);
+void sprites_draw_all(void);
 #endif
